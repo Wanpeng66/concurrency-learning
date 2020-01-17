@@ -35,7 +35,7 @@ public class Account {
     public static void main( String[] args ) throws InterruptedException {
         long begin = System.currentTimeMillis();
         ExecutorService threadPool = Executors.newScheduledThreadPool(50);
-        int k = 10;
+        int k = 49;
         CountDownLatch latch = new CountDownLatch( k );
         Account a = new Account();
         a.setBalance( 1000 );

@@ -18,19 +18,16 @@ public class MyLock {
         return Lock.lock;
     }
 
-    public  boolean lock(Account a,Account b) throws Exception {
-            synchronized (this){
+    public synchronized  boolean lock(Account a,Account b) throws Exception {
                 while(locks.contains( a )||locks.contains( b )){
                     this.wait();
                 }
                 locks.add( a );
                 locks.add( b );
                 return true;
-            }
-
     }
 
-    public void unlock( Account a, Account b ) {
+    public synchronized void unlock( Account a, Account b ) {
         if(locks.contains( a )) locks.remove( a );
         if(locks.contains( b )) locks.remove( b );
         this.notifyAll();
