@@ -1,5 +1,7 @@
 package com.wp.waitNotify;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,33 +11,30 @@ import java.util.List;
  * @Description: TODO
  * @date 2020/1/16 21:57
  */
+@Slf4j
 public class MyLock {
     private static volatile List<Account> locks = new ArrayList<>(  );
     public static MyLock getInstance(){
         return Lock.lock;
     }
 
-    public  boolean lock(Account a,Account b)  {
-        try{
+    public  boolean lock(Account a,Account b) throws Exception {
             synchronized (this){
                 while(locks.contains( a )||locks.contains( b )){
                     this.wait();
                 }
                 locks.add( a );
                 locks.add( b );
+                return true;
             }
-        }catch(Exception e){
-            unlock(a,b);
-        }finally{
-            return false;
-        }
+
     }
 
     public void unlock( Account a, Account b ) {
         if(locks.contains( a )) locks.remove( a );
         if(locks.contains( b )) locks.remove( b );
         this.notifyAll();
-        System.out.println( Thread.currentThread().getName()+"执行完转账，释放锁资源...");
+        log.info( "{} 执行完转账，释放锁资源...",Thread.currentThread().getName() );
     }
 
     public static class Lock{

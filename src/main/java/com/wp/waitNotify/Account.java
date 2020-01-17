@@ -1,6 +1,7 @@
 package com.wp.waitNotify;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -13,12 +14,17 @@ import java.util.concurrent.Executors;
  * @date 2020/1/16 21:54
  */
 @Data
+@Slf4j
 public class Account {
     private volatile Integer balance;
 
     public void transfer(int num,Account target){
         MyLock instance = MyLock.getInstance();
-        instance.lock(this,target);
+        try {
+            instance.lock(this,target);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.balance -= num;
         Integer targetBalance = target.getBalance();
         targetBalance +=num;
@@ -29,7 +35,7 @@ public class Account {
     public static void main( String[] args ) throws InterruptedException {
         long begin = System.currentTimeMillis();
         ExecutorService threadPool = Executors.newScheduledThreadPool(50);
-        int k = 1;
+        int k = 10;
         CountDownLatch latch = new CountDownLatch( k );
         Account a = new Account();
         a.setBalance( 1000 );
@@ -46,8 +52,8 @@ public class Account {
         }
         latch.await();
         long end = System.currentTimeMillis();
-        System.out.println("999个线程跑完，花了"+(end-begin)+"的时间");
-        System.out.println(a.getBalance());
+        log.info( "{} 个线程跑完，花了 {} 的时间......",k,end-begin );
+        log.info( a.getBalance()+"" );
         threadPool.shutdown();
 
     }
