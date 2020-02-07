@@ -22,14 +22,15 @@ public class Account {
         MyLock instance = MyLock.getInstance();
         try {
             instance.lock(this,target);
+            this.balance -= num;
+            Integer targetBalance = target.getBalance();
+            targetBalance +=num;
+            target.setBalance( targetBalance );
+            instance.unlock( this,target );
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error( "发生了异常...",e );
         }
-        this.balance -= num;
-        Integer targetBalance = target.getBalance();
-        targetBalance +=num;
-        target.setBalance( targetBalance );
-        instance.unlock( this,target );
+
     }
 
     public static void main( String[] args ) throws InterruptedException {
