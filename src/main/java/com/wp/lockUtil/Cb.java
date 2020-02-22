@@ -3,6 +3,7 @@ package com.wp.lockUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -104,8 +105,14 @@ public class Cb {
     }
 
     public static void main( String[] args ) {
-        Cb cb = new Cb();
-        cb.dz();
+        //Cb cb = new Cb();
+        //cb.dz();
+
+
+        String tmp = "dddd,eeee";
+        String[] split = tmp.split( "," );
+        List<String> strings = Arrays.asList( split );
+        System.out.println(strings);
     }
 
 
