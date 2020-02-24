@@ -29,7 +29,7 @@ public class HotWater {
             System.out.println("洗水壶...");
             TimeUnit.SECONDS.sleep( 1 );
             System.out.println("烧水...");
-            TimeUnit.SECONDS.sleep( 15 );
+            TimeUnit.SECONDS.sleep( 6 );
             String s = taskb.get();
             System.out.println("茶叶是"+s+"，开始泡茶...");
             return "泡茶完成。。。";
