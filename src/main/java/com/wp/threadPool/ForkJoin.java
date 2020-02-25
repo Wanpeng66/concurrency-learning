@@ -42,7 +42,7 @@ public class ForkJoin {
         private String[] datas;
         private int start;
         private int end;
-        public MR( String[] datas, int start, int end ) {
+        public MR( String[] datas, int  start, int end ) {
             this.datas = datas;
             this.start = start;
             this.end = end;
