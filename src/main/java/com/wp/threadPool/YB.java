@@ -1,11 +1,11 @@
 package com.wp.threadPool;
 
+import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.Random;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 
@@ -17,8 +17,8 @@ import java.util.function.*;
  */
 @Slf4j
 public class YB {
-    public static void main( String[] args ) throws ExecutionException, InterruptedException {
-        test04();
+    public static void main( String[] args ) throws Exception {
+        test07();
     }
 
     private static void test01() {
@@ -231,4 +231,155 @@ public class YB {
         System.out.println(join);
     }
 
+    //下面等效于对账中的cb
+    private static void test05(){
+        AtomicInteger count = new AtomicInteger( 0 );
+        BlockingQueue<String> datas = new LinkedBlockingQueue<>( 16 );
+        ExecutorService pool2 = Executors.newFixedThreadPool( 2 );
+        ExecutorService pool3 = Executors.newFixedThreadPool( 1 );
+        pool3.submit( new Runnable() {
+            @SneakyThrows
+            @Override
+            public void run() {
+                while(true){
+                    String take = datas.take();
+                    log.info( "拿到队列中数据,data:{}",take );
+                }
+            }
+        } );
+            while(count.get()<2){
+                CompletableFuture<Object> task1 = CompletableFuture.supplyAsync( new Supplier<Object>() {
+                    @SneakyThrows
+                    @Override
+                    public Object get() {
+                        //TimeUnit.SECONDS.sleep( 2 );
+                        log.info( "准备数据1成功..." );
+                        return "准备数据1成功...";
+                    }
+                },pool2).exceptionally( new Function<Throwable, Object>() {
+                    @Override
+                    public Object apply( Throwable e ) {
+                        log.info( "准备数据1失败，抛出异常" );
+                        return "准备数据1失败，抛出异常:"+e.getLocalizedMessage();
+                    }
+                } );
+                CompletableFuture<Object> task2 = CompletableFuture.supplyAsync( new Supplier<Object>() {
+                    @SneakyThrows
+                    @Override
+                    public Object get() {
+                        //TimeUnit.SECONDS.sleep( 4 );
+                        log.info( "准备数据2成功..." );
+                        return "准备数据2成功...";
+                    }
+                },pool2 ).exceptionally( new Function<Throwable, Object>() {
+                    @Override
+                    public Object apply( Throwable e ) {
+                        log.info( "准备数据2失败，抛出异常" );
+                        return "准备数据2失败，抛出异常:"+e.getLocalizedMessage();
+                    }
+                } );
+                CompletableFuture<Object> task3 = task1.thenCombine( task2, new BiFunction<Object, Object, Object>() {
+                    @SneakyThrows
+                    @Override
+                    public Object apply( Object o, Object o2 ) {
+                        //log.info( "task1结果：{},task2结果:{},对账成功...",o,o2 );
+                        TimeUnit.SECONDS.sleep( 2 );
+                        datas.put( count.get()+"" );
+                        return "将结果放入队列中,对账次数是"+count.getAndIncrement();
+                    }
+                } ).exceptionally( new Function<Throwable, Object>() {
+                    @Override
+                    public Object apply( Throwable e ) {
+
+                        return "将结果放入队列中失败，抛出异常:"+e.getLocalizedMessage();
+                    }
+                });
+                task3.join();
+            }
+
+
+    }
+
+    //下面写法等效于对账中countdownlatch的用法
+    private static void test06(){
+        AtomicInteger count = new AtomicInteger( 0 );
+        ExecutorService pool = Executors.newFixedThreadPool( 5 );
+        while(count.get()<2){
+            CompletableFuture<Object> task1 = CompletableFuture.supplyAsync( new Supplier<Object>() {
+                @SneakyThrows
+                @Override
+                public Object get() {
+                    TimeUnit.SECONDS.sleep( 2 );
+                    log.info( "准备数据1成功..." );
+                    return "准备数据1成功...";
+                }
+            },pool).exceptionally( new Function<Throwable, Object>() {
+                @Override
+                public Object apply( Throwable e ) {
+                    log.info( "准备数据1失败，抛出异常" );
+                    return "准备数据1失败，抛出异常:"+e.getLocalizedMessage();
+                }
+            } );
+            CompletableFuture<Object> task2 = CompletableFuture.supplyAsync( new Supplier<Object>() {
+                @SneakyThrows
+                @Override
+                public Object get() {
+                    TimeUnit.SECONDS.sleep( 4 );
+                    log.info( "准备数据2成功..." );
+                    return "准备数据2成功...";
+                }
+            } ).exceptionally( new Function<Throwable, Object>() {
+                @Override
+                public Object apply( Throwable e ) {
+                    log.info( "准备数据2失败，抛出异常" );
+                    return "准备数据2失败，抛出异常:"+e.getLocalizedMessage();
+                }
+            } );
+            CompletableFuture<Object> task3 = task1.thenCombine( task2, new BiFunction<Object, Object, Object>() {
+                @SneakyThrows
+                @Override
+                public Object apply( Object o, Object o2 ) {
+                    log.info( "task1结果：{},task2结果:{},对账成功...",o,o2 );
+                    TimeUnit.SECONDS.sleep( 2 );
+                    return "对账成功,对账次数为："+count.getAndIncrement();
+                }
+            } ).exceptionally( new Function<Throwable, Object>() {
+                @Override
+                public Object apply( Throwable e ) {
+
+                    return "对账失败，抛出异常:"+e.getLocalizedMessage();
+                }
+            });
+            log.info( (String) task3.join() );
+        }
+    }
+
+    //completionService的用法(批量提交异步任务，并且使任务结果有序化)
+    private static void test07() throws Exception {
+        ExecutorService pool = Executors.newFixedThreadPool( 2 );
+        BlockingQueue queue = new LinkedBlockingQueue( 16 );
+        ExecutorCompletionService<param> ecs = new ExecutorCompletionService<>( pool,queue );
+        for(int i=0;i<5;i++){
+            param param = new param();
+            int finalI = i;
+            ecs.submit( new Runnable() {
+                @SneakyThrows
+                @Override
+                public void run() {
+                   // TimeUnit.SECONDS.sleep( new Random().nextInt( 5 ) );
+                    param.setName( finalI +"" );
+                }
+            }, param );
+        }
+        while(true){
+            YB.param p = ecs.take().get();
+            System.out.println(p.getName());
+        }
+    }
+
+    @Data
+    static class param{
+        private String name;
+
+    }
 }
