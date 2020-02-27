@@ -139,7 +139,7 @@ public class YB {
             }
         } ).join();*/
 
-        //下面这种聚合方法，有参数(能拿到task2的返回结果)但是没返回
+        //下面这种聚合方法，有参数(能拿到task1，task2的返回结果)但是没返回
         /*task1.thenAcceptBoth( task2, new BiConsumer<Void, Object>() {
             @Override
             public void accept( Void aVoid, Object o ) {
