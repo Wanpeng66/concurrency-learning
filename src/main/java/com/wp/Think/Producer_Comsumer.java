@@ -119,7 +119,7 @@ public class Producer_Comsumer {
     }
 
     public static void main( String[] args ) throws InterruptedException {
-        Logger logger = new Logger();
+        /*Logger logger = new Logger();
         for(int i=0;i<10;i++){
             if(i%2==0){
                 logger.error( new Log( "错误级别日志, i="+i ) );
@@ -131,6 +131,13 @@ public class Producer_Comsumer {
 
         TimeUnit.SECONDS.sleep( 20 );
         logger.end();
-        System.out.println(logger.pool.isShutdown());
+        System.out.println(logger.pool.isShutdown());*/
+        Object a = new Object();
+        Object b = a ;
+        System.out.println("a="+a.toString());
+        System.out.println("b="+b.toString());
+        a = new Object();
+        System.out.println("a="+a.toString());
+        System.out.println("b="+b.toString());
     }
 }
