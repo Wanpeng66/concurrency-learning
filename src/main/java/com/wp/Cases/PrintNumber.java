@@ -113,7 +113,9 @@ public class PrintNumber {
     }
 
     //第一种方法: 通过等待、通知模式，让两个线程相互等待通知，交替打印
+    //可以用 synchronized+wait+notifyAll来实现，也可以用lock以及condition来实现
     private static void Method1() {
+
         AtomicInteger count = new AtomicInteger( 0 );
         ReentrantLock lock  = new ReentrantLock(  );
         //奇数的条件变量
