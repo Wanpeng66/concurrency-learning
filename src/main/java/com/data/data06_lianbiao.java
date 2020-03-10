@@ -2,6 +2,10 @@ package com.data;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author: wp
  * @Title: data06_lianbiao
@@ -55,12 +59,67 @@ public class data06_lianbiao {
       }
 
     public static void main( String[] args ) {
+        AtomicInteger flag = new AtomicInteger( 0 );
+        System.out.println();
+
+
+
         ListNode head = new ListNode( 1 );
         head.next = new ListNode( 2 );
         head.next.next = new ListNode( 3 );
         head.next.next.next = new ListNode( 2 );
         head.next.next.next.next = new ListNode( 0 );
-        System.out.println(check( head ));
+        //System.out.println(check( head ));
+        //reverse( head );
+        head.next.next.next.next.next = head;
+
+        System.out.println(checkCycle( head ));
+    }
+
+    //单链表反转
+    public static void reverse(ListNode head){
+          ListNode pre = null;
+          ListNode next = null;
+          ListNode current = head;
+
+          if(null==head){
+              return ;
+          }
+          while(null!=current){
+              log.info( current.val+"" );
+              next = current.next;
+              current.next = pre;
+              pre = current;
+              current = next;
+
+          }
+          log.info( "---------------------------------" );
+          while(null!=pre){
+              log.info( pre.val+"" );
+              pre = pre.next;
+          }
+
+    }
+
+    //判断单链表是否有环（下面写法少了一种情况:链表某一段(节点数大于1)成环,普遍使用快慢指针法判断）
+    public static boolean checkCycle(ListNode head){
+          ListNode current = head;
+          ListNode next = null;
+
+          if(null==head||null==head.next)
+              return false;
+
+          while(null!=current){
+              next = current.next;
+              if (next == current)
+                  return true;
+              if(next == head)
+                  return true;
+              current = next;
+          }
+
+          return false;
+
     }
 
 }
