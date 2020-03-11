@@ -55,11 +55,6 @@ class SumTask extends RecursiveTask<Long> {
 			long sum = 0;
 			for (int i = start; i < end; i++) {
 				sum += this.array[i];
-				// 故意放慢计算速度:
-				try {
-					Thread.sleep(2);
-				} catch (InterruptedException e) {
-				}
 			}
 			return sum;
 		}
