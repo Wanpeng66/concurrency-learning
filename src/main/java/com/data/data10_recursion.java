@@ -20,9 +20,9 @@ public class data10_recursion {
 
     public static void main( String[] args ) throws Exception {
         //假如这里有n个台阶，每次你可以跨1个台阶或者2个台阶，请问走这n个台阶有多少种走法？
-        //forkJoinMethod();
-        Long f = f( 50 );
-        System.out.println(f);
+        forkJoinMethod();
+        //Long f = f( 50 );
+        //System.out.println(f);
     }
 
     //用迭代来解决
@@ -54,10 +54,8 @@ public class data10_recursion {
 
         @Override
         protected Integer compute() {
-            if(x == 1){
-                return 1;
-            }else if(x == 2){
-                return 2;
+            if(x == 1 || x == 2){
+                return x;
             }
             /*Long tmp = cache.get( x );
             if(null!=tmp){
