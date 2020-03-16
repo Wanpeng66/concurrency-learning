@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class data11_sort {
 
     //冒泡排序 实际很少用，用插入排序的多
-    private static void bubbleSort(int[] array){
+    public static void bubbleSort(int[] array){
         boolean flag = true;
         for(int i=0;i<array.length;i++){     //O(n)
             if(flag){
@@ -32,7 +32,7 @@ public class data11_sort {
     }
 
     //比较蠢的插入排序写法
-    private static void insertionSort1(int[] array){
+    public static void insertionSort1(int[] array){
         //[2,3,4,1]
         for(int i=1;i<array.length;i++){
             for(int k=0;k<i;k++){
@@ -48,7 +48,7 @@ public class data11_sort {
     }
 
     //标准的插入排序写法
-    private static void insertionSort2(int[] array){
+    public static void insertionSort2(int[] array){
         //[2,3,4,1]
         for(int i=1;i<array.length;i++){     //O(n)
             int tmp = array[i];
@@ -65,7 +65,7 @@ public class data11_sort {
     }
 
     //选择排序 实际很少用，用插入排序的多
-    private static void selectionSort(int[] array){
+    public static void selectionSort(int[] array){
         for(int i=0;i<array.length;i++){            //O(n)
             int min = array[i];
             int index = i;
@@ -82,7 +82,7 @@ public class data11_sort {
 
     //归并排序:采用分治的思想,将要排序的数组分成更小数组，然后依次合并
     //它的精力是放在合并上
-    private static void mergeSort(int[] array){
+    public static void mergeSort(int[] array){
         int size = array.length;
         merge_sort(array,0,size-1);
     }
@@ -133,7 +133,7 @@ public class data11_sort {
     }
 
     //快速排序，也是分治思想，它的精力是放在拆分上
-    private static void quickSort(int[] array){
+    public static void quickSort(int[] array){
         int length = array.length;
         quick_sort(array,0,length-1);
     }
