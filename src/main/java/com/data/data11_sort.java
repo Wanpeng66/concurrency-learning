@@ -170,34 +170,26 @@ public class data11_sort {
     }
 
     private static int recursion_Find( int[] array, int begin, int end,int target ) {
-        if(begin>=end){
-            return begin;
-        }
         int m = partition( array,begin,end );
         if(m+1==target){
             return m+1;
         }else if(m+1<target){
             return recursion_Find( array,m+1,end,target );
         }else{
-            return recursion_Find( array,begin,m,target );
+            return recursion_Find( array,begin,m-1,target );
         }
     }
 
     public static void main( String[] args ) {
         int[] array = {2,5,4,100,8,1,0,5,10,40,20};
         //quickSort( array );
-        for (int i : array) {
+       /* for (int i : array) {
             System.out.println(i);
-        }
+        }*/
         System.out.println("--------------------------------");
         int k = findK( array, 5 );
         System.out.println(array[k]);
 
     }
 
-}
-class SortQuestion{
-    public static void main( String[] args ) {
-        
-    }
 }
