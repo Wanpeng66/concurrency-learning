@@ -3,6 +3,7 @@ package com.leetCode;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author: wp
@@ -85,7 +86,7 @@ public class P1117 {
 }
 
 class P1117_2{
-    Semaphore hydrogen = new Semaphore( 2 );
+    Semaphore hydrogen = new Semaphore( 0 );
     Semaphore oxygen = new Semaphore( 2 );
     public P1117_2() {
 
@@ -106,7 +107,7 @@ class P1117_2{
     public static void main( String[] args ) {
         ExecutorService pool = Executors.newFixedThreadPool( 10 );
         P1117_2 p = new P1117_2();
-        String str = "OOHHHH";
+        String str = "OOHHHHHHO";
         for (char c : str.toCharArray()) {
             if(c=='H'){
                 pool.submit( new Runnable() {
