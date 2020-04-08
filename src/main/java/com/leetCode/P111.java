@@ -13,13 +13,46 @@ import java.util.Queue;
 public class P111 {
     static int deep = 0;
     public static int minDepth(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<>(  );
+        queue.add( root );
+        int count = 1;
+        int floor = 1;
+        while(!queue.isEmpty()){
+            int k = 0;
+            for(int i=0;i<count;i++){
+                TreeNode node = queue.poll();
+                if(null!=node){
+                        if(null==node.left&&null==node.right){
+                            return floor;
+                        }else if(null==node.left){
+                            queue.offer( node.right );
+                            k++;
+                        }else if(null==node.right){
+                            queue.offer( node.left );
+                            k++;
+                        }else{
+                            queue.offer( node.left );
+                            queue.offer( node.right );
+                            k+=2;
+                        }
+                }else{
+                    return --floor;
+                }
+            }
+            count = k;
+            floor++;
+        }
+        return floor;
+    }
+
+    private static int dfs( TreeNode root ) {
         if(root==null){
             return 0;
         }else if(root.left==null&&root.right==null){
             return 1;
         }
-        int left = minDepth( root.left );
-        int right = minDepth( root.right );
+        int left = dfs( root.left );
+        int right = dfs( root.right );
         if(left==0&&right==0){
             return 1;
         }else if(left==0){
@@ -29,8 +62,6 @@ public class P111 {
         }else{
             return Math.min( left,right )+1;
         }
-
-
     }
 
     private static int Method1( TreeNode root ) {
@@ -114,7 +145,7 @@ public class P111 {
     }
 
     public static void main( String[] args ) {
-        String in = "[1,2,3,4,null,null,5]";
+        String in = "[1,2,null,3,null,4,null,5]";
         TreeNode root = stringToTreeNode( in );
         System.out.println(minDepth( root ));
 
