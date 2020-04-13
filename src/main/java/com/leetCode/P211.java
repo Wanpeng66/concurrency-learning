@@ -123,37 +123,3 @@ public class P211 {
         boolean search1 = p.search( "b.." );
     }
 }
-class TrieNode{
-    char val;
-    Map<Character,TrieNode> nodes ;
-    boolean isEnding;
-
-    public TrieNode( char val ) {
-        this.val = val;
-        nodes = new HashMap<>( 26 );
-    }
-
-    public char getVal() {
-        return val;
-    }
-
-    public void setVal( char val ) {
-        this.val = val;
-    }
-
-    public Map<Character, TrieNode> getNodes() {
-        return nodes;
-    }
-
-    public void setNodes( Map<Character, TrieNode> nodes ) {
-        this.nodes = nodes;
-    }
-
-    public boolean isEnding() {
-        return isEnding;
-    }
-
-    public void setEnding( boolean ending ) {
-        isEnding = ending;
-    }
-}
