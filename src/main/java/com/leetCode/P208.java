@@ -1,7 +1,9 @@
 package com.leetCode;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author: wp
@@ -87,6 +89,7 @@ class TrieNode{
     char val;
     Map<Character,TrieNode> nodes ;
     boolean isEnding;
+    Set<Integer> index = new HashSet<>(  );
 
     public TrieNode( char val ) {
         this.val = val;
@@ -115,5 +118,13 @@ class TrieNode{
 
     public void setEnding( boolean ending ) {
         isEnding = ending;
+    }
+
+    public Set<Integer> getIndex() {
+        return index;
+    }
+
+    public void setIndex( Set<Integer> index ) {
+        this.index = index;
     }
 }
