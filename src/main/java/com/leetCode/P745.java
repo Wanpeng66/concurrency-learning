@@ -14,14 +14,15 @@ import java.util.stream.Collectors;
  * @date 2020/4/13 21:30
  */
 public class P745 {
-    Map<String,Integer> prefixDicts = new HashMap<>(  );
     Map<String,Integer> suffixDicts = new HashMap<>(  );
+    Map<String,Integer> cache = new HashMap<>( 16 );
     TrieNode pre = new TrieNode( '/' );
     TrieNode suf = new TrieNode( '/' );
     String[] words ;
     public P745(String[] words) {
         this.words = words;
         buildTrie( words );
+        //build1( words );
     }
     private void buildTrie( String[] words ) {
         for (int i = 0; i < words.length; i++) {
@@ -42,7 +43,7 @@ public class P745 {
             }
             node.setEnding( true );
             //反转字符串，构建后缀数
-            String reverse = reverse( words[i] );
+            String reverse = new StringBuffer( words[i] ).reverse().toString();
             node = suf;
             chars = reverse.toCharArray();
             for (char cr : chars) {
@@ -82,9 +83,7 @@ public class P745 {
         for (int i = 0; i < words.length; i++) {
             String word = words[i];
             for(int k=0;k<=word.length();k++){
-                String prefix = word.substring( 0,k );
                 String suffix = word.substring( word.length()-k );
-                prefixDicts.put( prefix+"#"+word,i );
                 suffixDicts.put( suffix+"#"+word,i );
             }
         }
@@ -92,8 +91,16 @@ public class P745 {
 
 
     public int f(String prefix, String suffix) {
+        return f2( prefix, suffix );
+    }
+
+    private int f2( String prefix, String suffix ) {
         if(prefix.equals( "" )&&suffix.equals( "" )){
             return words.length-1;
+        }
+        Integer val = cache.get( prefix + "-" + suffix );
+        if(val!=null){
+            return val.intValue();
         }
         TrieNode node = pre;
         char[] chars = prefix.toCharArray();
@@ -119,70 +126,66 @@ public class P745 {
 
         }
         Set<Integer> s2 = node.getIndex();
-        if(s1.isEmpty()&&s2.isEmpty()){
-            return -1;
-        } else if(s1.isEmpty()){
-            return s2.stream().sorted(Comparator.reverseOrder()).collect( Collectors.toList()).get( 0 );
+        int res = -1;
+        if(s1.isEmpty()){
+            res =  (Integer)s2.toArray( )[s2.size()-1];
         }else if(s2.isEmpty()){
-            return s1.stream().sorted( Comparator.reverseOrder() ).collect( Collectors.toList() ).get( 0 );
+            res = (Integer)s1.toArray( )[s1.size()-1];
         }else{
-            List<Integer> collect = s1.stream().filter( integer -> s2.contains( integer ) ).sorted( Comparator.reverseOrder() ).collect( Collectors.toList() );
-            if(collect.isEmpty()){
-                return -1;
-            }else{
-                return collect.get( 0 );
+            for (int i:s2) {
+                if(!s1.contains(i))continue;
+                res=Math.max(res,i);
             }
+
         }
+        cache.put( prefix+"-"+suffix,res );
+        return res;
     }
 
     private int method1( String prefix, String suffix ) {
         if(prefix.equals( "" )&&suffix.equals( "" )){
             return words.length-1;
         }
+        Integer val = cache.get( prefix + "#" + suffix );
+        if(val!=null){
+            return val.intValue();
+        }
         Set<String> keySet = null;
+        int index = -1;
+        Iterator<String> iterator = suffixDicts.keySet().iterator();
         if(prefix.equals( "" )){
-            keySet = suffixDicts.keySet();
-            Set<Integer> collect = keySet.stream().filter( s -> s.startsWith( suffix + "#" ) ).
-                    map( s -> suffixDicts.get( s ) ).sorted( Comparator.reverseOrder() ).
-                    collect( Collectors.toCollection( LinkedHashSet :: new ) );
-            if(collect.isEmpty()){
-                return -1;
-            }else{
-                return collect.iterator().next();
+            while(iterator.hasNext()){
+                String key = iterator.next();
+                if(key.startsWith( suffix+"#" )){
+                    Integer var = suffixDicts.get( key );
+                    if(var>index){
+                        index = var;
+                    }
+                }
             }
-
         }else if(suffix.equals( "" )){
-            keySet = prefixDicts.keySet();
-            Set<Integer> collect = keySet.stream().filter( s -> s.startsWith( prefix + "#" ) ).
-                    map( s -> prefixDicts.get( s ) ).sorted( Comparator.reverseOrder() ).
-                    collect( Collectors.toCollection( LinkedHashSet :: new ) );
-            if(collect.isEmpty()){
-                return -1;
-            }else{
-                return collect.iterator().next();
+            while(iterator.hasNext()){
+                String key = iterator.next();
+                if(key.startsWith( prefix ) && key.split( "#" )[1].startsWith( prefix )){
+                    Integer var = suffixDicts.get( key );
+                    if(var>index){
+                        index = var;
+                    }
+                }
             }
         }else{
-            keySet = suffixDicts.keySet();
-            Set<Integer> l1 = keySet.stream().filter( s -> s.startsWith( suffix + "#" ) ).
-                    map( s -> suffixDicts.get( s ) ).sorted( Comparator.reverseOrder() ).
-                    collect( Collectors.toCollection( LinkedHashSet :: new ) );
-            keySet = prefixDicts.keySet();
-            Set<Integer> l2 = keySet.stream().filter( s -> s.startsWith( prefix + "#" ) ).
-                    map( s -> prefixDicts.get( s ) ).sorted( Comparator.reverseOrder() ).
-                    collect( Collectors.toCollection( LinkedHashSet :: new ) );
-            if(l1.isEmpty()||l2.isEmpty()){
-                return -1;
-            }else{
-                Set<Integer> collect = l1.stream().filter( val -> l2.contains( val ) ).
-                        sorted( Comparator.reverseOrder() ).
-                        collect( Collectors.toCollection( LinkedHashSet :: new ) );
-                if(collect.isEmpty()){
-                    return -1;
-                }else{
-                    return collect.iterator().next();
+            while(iterator.hasNext()){
+                String key = iterator.next();
+                if(key.startsWith( suffix+"#" ) && key.split( "#" )[1].startsWith( prefix )){
+                    Integer var = suffixDicts.get( key );
+                    if(var>index){
+                        index = var;
+                    }
                 }
             }
         }
+        cache.put( prefix+"#"+suffix,index );
+        return index;
     }
 
     public static void main( String[] args ) {
