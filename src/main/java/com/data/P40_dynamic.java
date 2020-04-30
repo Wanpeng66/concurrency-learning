@@ -145,7 +145,7 @@ public class P40_dynamic {
         dp( res,4 );
         //System.out.println(min);
         int[] money = {1,2147483647};
-        int max = 2;
+        int max = 11;
 
         AtomicInteger num = new AtomicInteger( max/money[0] );
         coins( money,max,num );
